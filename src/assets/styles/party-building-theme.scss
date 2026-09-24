@@ -1,0 +1,40 @@
+/** 党建管理 - 红色主题样式（配合 partyBuildingTheme.js 的 body.party-building-theme 类） */
+$party-building-primary: #c8161d;
+$party-building-primary-light: #fdecee;
+$party-building-primary-dark: #9b1117;
+
+body.party-building-theme {
+  .tags-view-container .tags-view-item.active {
+    background-color: $party-building-primary !important;
+    border-color: $party-building-primary !important;
+  }
+
+  .sidebar-container .el-menu-item.is-active,
+  .sidebar-container .el-sub-menu.is-active > .el-sub-menu__title {
+    color: $party-building-primary !important;
+  }
+
+  .el-pagination.is-background .el-pager li.is-active {
+    background-color: $party-building-primary !important;
+  }
+
+  .el-checkbox__input.is-checked .el-checkbox__inner,
+  .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+    background-color: $party-building-primary !important;
+    border-color: $party-building-primary !important;
+  }
+
+  .el-radio__input.is-checked .el-radio__inner {
+    background-color: $party-building-primary !important;
+    border-color: $party-building-primary !important;
+  }
+
+  .el-switch.is-checked .el-switch__core {
+    background-color: $party-building-primary !important;
+    border-color: $party-building-primary !important;
+  }
+
+  .section-title {
+    color: $party-building-primary-dark;
+  }
+}

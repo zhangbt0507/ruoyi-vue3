@@ -1,0 +1,170 @@
+// Element Plus 下拉框宽度修复样式
+// 解决下拉框在不同加载时机下宽度不一致的问题
+
+/* 全局下拉框最小宽度设置 */
+.el-select-dropdown {
+  min-width: 160px !important;
+  max-width: 500px !important;
+  
+  /* 确保下拉框宽度计算正确 */
+  &.el-popper {
+    min-width: var(--el-select-width, 160px) !important;
+  }
+  
+  /* 修复宽度计算延迟问题 */
+  &[data-popper-placement] {
+    min-width: 160px !important;
+  }
+}
+
+/* 下拉选项样式优化 */
+.el-select-dropdown__item {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-height: 34px !important;
+  line-height: 34px !important;
+  padding: 0 20px !important;
+  box-sizing: border-box !important;
+  
+  /* 悬停效果 */
+  &:hover {
+    background-color: var(--el-fill-color-light) !important;
+  }
+  
+  /* 选中状态 */
+  &.selected {
+    color: var(--el-color-primary) !important;
+    font-weight: 500 !important;
+  }
+}
+
+/* 输入框最小宽度保证 */
+.el-select {
+  min-width: 120px !important;
+  
+  .el-input {
+    min-width: 120px !important;
+    
+    .el-input__inner {
+      min-width: 120px !important;
+    }
+  }
+  
+  /* 小尺寸下拉框 */
+  &.el-select--small {
+    min-width: 100px !important;
+    
+    .el-input {
+      min-width: 100px !important;
+    }
+  }
+  
+  /* 大尺寸下拉框 */
+  &.el-select--large {
+    min-width: 140px !important;
+    
+    .el-input {
+      min-width: 140px !important;
+    }
+  }
+}
+
+/* 小尺寸下拉选项特殊处理 */
+.el-select--small + .el-select-dropdown {
+  .el-select-dropdown__item {
+    min-height: 32px !important;
+    line-height: 32px !important;
+    padding: 0 16px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* 大尺寸下拉选项特殊处理 */
+.el-select--large + .el-select-dropdown {
+  .el-select-dropdown__item {
+    min-height: 40px !important;
+    line-height: 40px !important;
+    padding: 0 24px !important;
+    font-size: 15px !important;
+  }
+}
+
+/* Popper容器修复 */
+.el-popper {
+  &.is-pure {
+    min-width: 160px !important;
+  }
+  
+  /* 确保Popper不会被压缩 */
+  &[data-popper-placement^="bottom"] {
+    min-width: 160px !important;
+  }
+  
+  &[data-popper-placement^="top"] {
+    min-width: 160px !important;
+  }
+}
+
+/* 修复动态内容加载时的宽度问题 */
+.el-select-dropdown.el-popper[data-popper-placement] {
+  /* 强制重新计算宽度 */
+  width: auto !important;
+  min-width: 160px !important;
+  
+  /* 延迟显示，确保内容已加载 */
+  opacity: 0;
+  animation: fadeInSelect 0.2s ease-in-out forwards;
+}
+
+@keyframes fadeInSelect {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 特殊情况：表单中的下拉框 */
+.el-form-item .el-select {
+  width: 100% !important;
+  min-width: 120px !important;
+}
+
+/* 表格中的下拉框 */
+.el-table .el-select {
+  min-width: 100px !important;
+}
+
+/* 对话框中的下拉框 */
+.el-dialog .el-select {
+  min-width: 120px !important;
+}
+
+/* 确保长文本选项能正确显示 */
+.el-select-dropdown__item[title] {
+  position: relative;
+  
+  &:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background: var(--el-color-info-dark-2);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 9999;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* 客群下拉：客群名较长，加宽面板避免省略号 */
+.group-select-dropdown-wide {
+  min-width: 320px !important;
+}

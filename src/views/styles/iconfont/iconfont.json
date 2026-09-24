@@ -1,0 +1,93 @@
+{
+  "id": "4316499",
+  "name": "智慧互联",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "7287571",
+      "name": "电话",
+      "font_class": "ydyx",
+      "unicode": "e739",
+      "unicode_decimal": 59193
+    },
+    {
+      "icon_id": "37190823",
+      "name": "流失客户数",
+      "font_class": "lskh",
+      "unicode": "e719",
+      "unicode_decimal": 59161
+    },
+    {
+      "icon_id": "38617416",
+      "name": "箭头",
+      "font_class": "arrow-lv",
+      "unicode": "e672",
+      "unicode_decimal": 58994
+    },
+    {
+      "icon_id": "11784372",
+      "name": "箭头",
+      "font_class": "arrow-red1",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "38617415",
+      "name": "箭头",
+      "font_class": "arrow-red",
+      "unicode": "e671",
+      "unicode_decimal": 58993
+    },
+    {
+      "icon_id": "10990118",
+      "name": "箭头",
+      "font_class": "agent-lv",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "29373399",
+      "name": "我的绩效",
+      "font_class": "jx",
+      "unicode": "e670",
+      "unicode_decimal": 58992
+    },
+    {
+      "icon_id": "10062927",
+      "name": "绩效考核",
+      "font_class": "DevelopmentPathMap_02_Gray",
+      "unicode": "e617",
+      "unicode_decimal": 58903
+    },
+    {
+      "icon_id": "21245384",
+      "name": "竞品流失-选中@2x",
+      "font_class": "xuanzhong2x",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "25552597",
+      "name": "流失",
+      "font_class": "ls",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    },
+    {
+      "icon_id": "1606084",
+      "name": "智能存款",
+      "font_class": "ck",
+      "unicode": "e63a",
+      "unicode_decimal": 58938
+    },
+    {
+      "icon_id": "8206927",
+      "name": "贷款",
+      "font_class": "dk",
+      "unicode": "e60c",
+      "unicode_decimal": 58892
+    }
+  ]
+}

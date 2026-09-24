@@ -1,0 +1,148 @@
+// cover some element-ui styles
+
+.el-breadcrumb__inner,
+.el-breadcrumb__inner a {
+  font-weight: 400 !important;
+}
+
+.el-upload {
+  input[type="file"] {
+    display: none !important;
+  }
+}
+
+.el-upload__input {
+  display: none;
+}
+
+.cell {
+  .el-tag {
+    margin-right: 0px;
+  }
+}
+
+.small-padding {
+  .cell {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+.fixed-width {
+  .el-button--mini {
+    padding: 7px 10px;
+    width: 60px;
+  }
+}
+
+.status-col {
+  .cell {
+    padding: 0 10px;
+    text-align: center;
+
+    .el-tag {
+      margin-right: 0px;
+    }
+  }
+}
+
+// to fixed https://github.com/ElemeFE/element/issues/2461
+.el-dialog {
+  transform: none;
+  left: 0;
+  position: relative;
+  margin: 0 auto;
+}
+
+// refine element ui upload
+.upload-container {
+  .el-upload {
+    width: 100%;
+
+    .el-upload-dragger {
+      width: 100%;
+      height: 200px;
+    }
+  }
+}
+
+// dropdown
+.el-dropdown-menu {
+  a {
+    display: block
+  }
+}
+
+// fix date-picker ui bug in filter-item
+.el-range-editor.el-input__inner {
+  display: inline-flex !important;
+}
+
+// to fix el-date-picker css style
+.el-range-separator {
+  box-sizing: content-box;
+}
+
+.el-menu--collapse
+  > div
+  > .el-submenu
+  > .el-submenu__title
+  .el-submenu__icon-arrow {
+  display: none;
+}
+
+.el-dropdown .el-dropdown-link{
+  color: var(--el-color-primary) !important;
+}
+
+// 修复Element Plus下拉框宽度问题
+.el-select-dropdown {
+  min-width: 160px !important;
+  
+  // 确保下拉框宽度至少与触发器一致
+  &.el-popper {
+    min-width: var(--el-select-width, 160px) !important;
+  }
+}
+
+.el-select-dropdown__item {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-height: 34px !important;
+  line-height: 34px !important;
+  padding: 0 20px !important;
+  
+  // 确保选项内容不会被挤压
+  &:hover {
+    background-color: var(--el-fill-color-light) !important;
+  }
+}
+
+// 确保输入框有最小宽度
+.el-select {
+  min-width: 120px;
+  
+  .el-input {
+    min-width: 120px;
+  }
+  
+  // 修复下拉框宽度计算
+  .el-input__inner {
+    min-width: 120px;
+  }
+}
+
+// 修复Popper定位和宽度问题
+.el-popper.is-pure {
+  min-width: 160px !important;
+}
+
+// 针对小尺寸下拉框的特殊处理
+.el-select--small {
+  .el-select-dropdown__item {
+    min-height: 32px !important;
+    line-height: 32px !important;
+    padding: 0 16px !important;
+  }
+}
