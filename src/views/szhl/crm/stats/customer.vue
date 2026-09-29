@@ -13,6 +13,10 @@
       <template #queryOrg>
         <CrmOrgSelect v-model="queryParams.queryOrg" />
       </template>
+      <!-- 网格筛选：与客户归属列表同一套行政区划树弹窗，编码写入 gridArea -->
+      <template #gridRegion>
+        <CustomerGridSelect v-model="queryParams.gridArea" placeholder="请选择客户网格" />
+      </template>
       <template #actions-left>
         <el-button type="primary" plain icon="DataAnalysis" @click="openSummary" v-hasPermi="['crm:stats:customer']">汇总统计</el-button>
         <el-button plain icon="Setting" @click="columnDialogOpen = true">列显示设定</el-button>
@@ -100,11 +104,11 @@
 import { computed, getCurrentInstance, reactive, ref, toRefs } from 'vue'
 import { listCustomerStats, customerSummaryOrg, customerSummaryManager, submitCustomerStatsExport } from '@/api/szhl/crm/stats'
 import { selectGroupList } from '@/api/szhl/crm/group'
-import { getGridTree } from '@/api/szhl/crm/attribution'
 import SearchForm from '@/components/SearchForm'
 import CustomerLink from '@/views/szhl/crm/components/CustomerLink'
 import ColumnSettingsDialog from '@/views/szhl/crm/components/ColumnSettingsDialog'
 import CrmOrgSelect from '@/views/szhl/crm/components/CrmOrgSelect'
+import CustomerGridSelect from '@/views/szhl/crm/components/CustomerGridSelect'
 import { formatUserDisplayName, useUserOptions } from '@/utils/userEnum'
 import { formatYuanToWan, isYuanAmountField } from '@/utils/crmDataTag'
 import { useStatsColumnSettings } from './composables/useStatsColumnSettings'
@@ -123,7 +127,6 @@ const loading = ref(false)
 const tableList = ref([])
 const total = ref(0)
 const groupOptions = ref([])
-const gridNodes = ref([])
 const selectedGroupIds = ref([])
 const summaryOpen = ref(false)
 const summaryLoading = ref(false)
@@ -142,8 +145,6 @@ const data = reactive({
     customerName: undefined,
     queryOrg: undefined,
     managerId: undefined,
-    gridStreet: undefined,
-    gridCommunity: undefined,
     gridArea: undefined,
     periodRange: []
   }
@@ -165,16 +166,6 @@ const {
   loadColumnSettings
 } = useStatsColumnSettings('stats-customer', refreshAfterColumns)
 const { exportPolling, submit: submitExport } = useStatsExportPolling(submitCustomerStatsExport)
-
-const streetNodes = computed(() => gridNodes.value.filter(item => item.level === 1))
-const communityNodes = computed(() => {
-  const street = streetNodes.value.find(item => item.gridName === queryParams.value.gridStreet)
-  return street ? gridNodes.value.filter(item => item.parentCode === street.gridCode) : []
-})
-const gridAreaNodes = computed(() => {
-  const community = communityNodes.value.find(item => item.gridName === queryParams.value.gridCommunity)
-  return community ? gridNodes.value.filter(item => item.parentCode === community.gridCode) : []
-})
 
 const dynamicMetricColumns = computed(() => {
   const definitions = {}
@@ -259,27 +250,12 @@ const searchFields = computed(() => [
   { label: '管户机构', prop: 'queryOrg', type: 'slot', slotName: 'queryOrg' },
   { label: '管户经理', prop: 'managerId', type: 'userSelect', placeholder: '请选择管户经理', filterable: true },
   {
-    label: '街道/乡镇',
-    prop: 'gridStreet',
-    type: 'select',
-    placeholder: '请选择',
-    options: streetNodes.value.map(item => ({ label: item.gridName, value: item.gridName })),
-    change: handleStreetChange
-  },
-  {
-    label: '社区/村庄',
-    prop: 'gridCommunity',
-    type: 'select',
-    placeholder: '请选择',
-    options: communityNodes.value.map(item => ({ label: item.gridName, value: item.gridName })),
-    change: handleCommunityChange
-  },
-  {
-    label: '网格区域',
+    // 网格筛选由 CustomerGridSelect 弹窗选用，选中编码写进 gridArea（grid_code）；
+    // prop 就是 gridArea，SearchForm 重置时才能把内部副本一起清掉
+    label: '客户网格',
     prop: 'gridArea',
-    type: 'select',
-    placeholder: '请选择',
-    options: gridAreaNodes.value.map(item => ({ label: item.gridName, value: item.gridCode }))
+    type: 'slot',
+    slotName: 'gridRegion'
   },
   { label: '基期/末期 *', prop: 'periodRange', type: 'daterange', startPlaceholder: '基期', endPlaceholder: '末期' }
 ])
@@ -288,16 +264,6 @@ function handleGroupChange (value) {
   selectedGroupIds.value = value || []
   tableList.value = []
   total.value = 0
-}
-
-function handleStreetChange (value) {
-  queryParams.value.gridStreet = value
-  queryParams.value.gridCommunity = undefined
-  queryParams.value.gridArea = undefined
-}
-
-function handleCommunityChange () {
-  queryParams.value.gridArea = undefined
 }
 
 function hasValidPeriod () {
@@ -365,8 +331,6 @@ function resetQuery () {
     customerName: undefined,
     queryOrg: undefined,
     managerId: undefined,
-    gridStreet: undefined,
-    gridCommunity: undefined,
     gridArea: undefined,
     periodRange: []
   })
@@ -444,9 +408,6 @@ function formatUser (value) {
 
 function init () {
   loadColumnSettings()
-  getGridTree().then(res => {
-    gridNodes.value = res.data || []
-  })
   selectGroupList().then(res => {
     groupOptions.value = res.data || []
     if (groupOptions.value.length > 0) {

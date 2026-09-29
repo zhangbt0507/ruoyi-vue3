@@ -1,4 +1,5 @@
-import request from '@/utils/request'
+import { createRequest } from '@/utils/subRequest'
+const request = createRequest('crm')
 
 // 列表展示字段集（六张 Hive 源表字段契约，后端走 Redis 缓存）
 export function listDataTag() {

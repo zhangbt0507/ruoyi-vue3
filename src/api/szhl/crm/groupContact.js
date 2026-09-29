@@ -1,4 +1,5 @@
-import request from '@/utils/request'
+import { createRequest } from '@/utils/subRequest'
+const request = createRequest('crm')
 
 function normalizeGroupCustomerQuery(query) {
   const params = { ...query }

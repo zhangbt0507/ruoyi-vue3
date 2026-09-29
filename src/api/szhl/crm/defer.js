@@ -1,4 +1,5 @@
-import request from '@/utils/request'
+import { createRequest } from '@/utils/subRequest'
+const request = createRequest('crm')
 
 // 暂缓申请列表
 export function listDefer(query) {

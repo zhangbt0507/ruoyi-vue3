@@ -334,7 +334,7 @@ function handleExport() {
   const params = { ...queryParams.value }
   delete params.pageNum
   delete params.pageSize
-  proxy.download('/crm/followup/export', params, '后续跟踪.xlsx')
+  proxy.download('/crm/followup/export', params, '后续跟踪.xlsx', { appCode: 'crm' })
 }
 
 function openCustomer360(row) {

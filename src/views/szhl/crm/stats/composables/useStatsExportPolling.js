@@ -22,7 +22,8 @@ export function useStatsExportPolling(submitExport) {
         if (status.status === 'SUCCESS') {
           stopExportPolling()
           proxy.$modal.msgSuccess('导出完成，开始下载')
-          proxy.$download.name(status.fileName)
+          // 文件由 ruoyi-crm 写盘，下载必须落回 crm 网关（见 gatewayUrl 的 appCode 参数）
+          proxy.$download.name(status.fileName, true, 'crm')
         } else if (status.status === 'FAIL') {
           stopExportPolling()
           proxy.$modal.msgError('导出失败：' + (status.errorMessage || '未知原因'))

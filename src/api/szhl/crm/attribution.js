@@ -21,6 +21,22 @@ export function listAttribution(query) {
   })
 }
 
+// 「数据月份」下拉选项：全部已归档的月末快照日期，倒序；未归档月份不出现
+export function listDataTagSnapshotMonths() {
+  return request({
+    url: '/crm/attribution/dataTagMonths',
+    method: 'get'
+  })
+}
+
+// 「当前」视图对应的数据日期（最近一次成功跑批的产品分区，yyyy-MM-dd）
+export function getAttributionDataDate() {
+  return request({
+    url: '/crm/attribution/dataDate',
+    method: 'get'
+  })
+}
+
 // 客户归属贷款明细：按客户内码查询，支持历史报告日及关联组全量口径。
 export function queryAttributionLoanDetail(data) {
   return request({
@@ -56,10 +72,10 @@ export function assignManager(data) {
   })
 }
 
-// 网格维护保存
-export function saveGrid(data) {
+// 网格维护保存：把 crm_region_code 编码存入 grid_code
+export function saveRegionGrid(data) {
   return request({
-    url: '/crm/attribution/grid/save',
+    url: '/crm/attribution/grid/saveRegion',
     method: 'post',
     data: data
   })

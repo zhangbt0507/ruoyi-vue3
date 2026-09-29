@@ -13,6 +13,10 @@
       <template #queryOrg>
         <CrmOrgSelect v-model="queryParams.queryOrg" />
       </template>
+      <!-- 网格筛选：与客户归属列表同一套行政区划树弹窗，编码写入 gridArea -->
+      <template #gridRegion>
+        <CustomerGridSelect v-model="queryParams.gridArea" placeholder="请选择客户网格" />
+      </template>
       <template #portraitTag>
         <PortraitTagQuerySelect
           v-model="queryParams.portraitTagIds"
@@ -63,7 +67,8 @@
         <span v-if="isEffectiveDefer(row)" class="defer-end-date">{{ formatValidDeferDate(row) }}</span>
         <span v-else></span>
       </template>
-      <template #grid="{ row }">{{ [row.gridStreet, row.gridCommunity].filter(Boolean).join('/') || '-' }}</template>
+      <!-- 常驻网格：后端已把 gridCode 转成区划名回填到 grid，列表与导出同口径 -->
+      <template #grid="{ row }">{{ row.grid || '-' }}</template>
       <template #attributionOrg="{ row }">
         <dict-tag :options="orgOptions" :value="row.attributionOrg" />
       </template>
@@ -147,7 +152,7 @@ import MarketingDetailDialog from '@/views/szhl/crm/components/MarketingDetailDi
 import PortraitTagQuerySelect from '@/views/szhl/crm/components/PortraitTagQuerySelect'
 import ColumnSettingsDialog from '@/views/szhl/crm/components/ColumnSettingsDialog'
 import { selectGroupList } from '@/api/szhl/crm/group'
-import { getGridTree, listFeatureTagTree } from '@/api/szhl/crm/attribution'
+import { listFeatureTagTree } from '@/api/szhl/crm/attribution'
 import { getColumnConfig, saveColumnConfig } from '@/api/szhl/crm/column'
 import { listDataTag } from '@/api/szhl/crm/dataTag'
 import { listAdvancedQueryConditions } from '@/api/szhl/crm/advancedQuery'
@@ -159,6 +164,7 @@ import { formatDataTagLabel, formatDataTagBoolean, formatYuanToWan, isYuanAmount
 import { formatUserDisplayName, useUserOptions } from '@/utils/userEnum'
 import UserSelect from '@/components/UserSelect'
 import CrmOrgSelect from '@/views/szhl/crm/components/CrmOrgSelect'
+import CustomerGridSelect from '@/views/szhl/crm/components/CustomerGridSelect'
 
 const { proxy } = getCurrentInstance()
 const userStore = useUserStore()
@@ -188,7 +194,6 @@ const levelOpen = ref(false)
 const columnDialogOpen = ref(false)
 const groupOptions = ref([])
 const featureTags = ref([])
-const gridNodes = ref([])
 // 数据标签自定义分类（/crm/dataTag/list 的 categories），供列显示设定弹窗分组
 const dataTagCategories = ref([])
 const advancedQueryOptions = ref([])
@@ -203,8 +208,7 @@ const data = reactive({
     customerNo: undefined,
     queryOrg: undefined,
     managerId: undefined,
-    gridStreet: undefined,
-    gridCommunity: undefined,
+    gridArea: undefined,
     portraitTagIds: [],
     portraitTagMatchMode: 'ANY',
     advancedQuery: undefined
@@ -261,7 +265,7 @@ const contactTableColumns = computed(() => {
       align: 'center',
       showOverflowTooltip: true,
       visible: colVisible.value.last3mContactDate,
-      formatter: row => proxy.parseTime(row.last3mContactDate, '{y}-{m}-{d} {h}:{i}:{s}') || ''
+      formatter: row => proxy.parseTime(row.last3mContactDate, '{y}-{m}-{d}') || ''
     },
     { key: 'contactPhone', label: '联系电话', prop: 'contactPhone', width: 130, visible: colVisible.value.contactPhone },
     { key: 'contactAddress', label: '联系地址', prop: 'contactAddress', width: 220, showOverflowTooltip: true, visible: colVisible.value.contactAddress },
@@ -300,14 +304,6 @@ const contactTableColumns = computed(() => {
   return baseColumns.concat(dataColumns, [
     { key: 'actions', label: '操作', width: 160, align: 'center', fixed: 'right', slot: 'actions' }
   ])
-})
-const streetNodes = computed(() => {
-  const parentCodes = new Set(gridNodes.value.map(item => item.parentCode).filter(Boolean))
-  return gridNodes.value.filter(item => parentCodes.has(item.gridCode))
-})
-const communityNodes = computed(() => {
-  const street = streetNodes.value.find(item => item.gridName === queryParams.value.gridStreet)
-  return street ? gridNodes.value.filter(item => item.parentCode === street.gridCode) : []
 })
 const searchFields = computed(() => [
   {
@@ -357,25 +353,12 @@ const searchFields = computed(() => [
     filterable: true
   },
   {
-    label: '街道/乡镇',
-    prop: 'gridStreet',
-    type: 'select',
-    placeholder: '请选择',
-    options: streetNodes.value.map(item => ({
-      label: item.gridName,
-      value: item.gridName
-    })),
-    change: handleStreetChange
-  },
-  {
-    label: '社区/村庄',
-    prop: 'gridCommunity',
-    type: 'select',
-    placeholder: '请选择',
-    options: communityNodes.value.map(item => ({
-      label: item.gridName,
-      value: item.gridName
-    }))
+    // 网格筛选由 CustomerGridSelect 弹窗选用，选中编码写进 gridArea（grid_code）；
+    // prop 就是 gridArea，SearchForm 重置时才能把内部副本一起清掉
+    label: '客户网格',
+    prop: 'gridArea',
+    type: 'slot',
+    slotName: 'gridRegion'
   },
   {
     label: '画像标签',
@@ -401,11 +384,6 @@ function getDefaultActiveGroupIds () {
   return groupOptions.value
     .filter(item => !isGroupExpired(item))
     .map(item => item.id)
-}
-
-function handleStreetChange (value) {
-  queryParams.value.gridStreet = value
-  queryParams.value.gridCommunity = undefined
 }
 
 // 普通列表只查询当前可见动态列（后端按启用定义与 Registry 白名单取交集）。
@@ -443,8 +421,7 @@ function resetQuery () {
     customerNo: undefined,
     queryOrg: undefined,
     managerId: undefined,
-    gridStreet: undefined,
-    gridCommunity: undefined,
+    gridArea: undefined,
     portraitTagIds: [],
     portraitTagMatchMode: 'ANY',
     advancedQuery: undefined
@@ -703,7 +680,7 @@ function handleExport () {
     params.portraitTagIds = params.portraitTagIds.join(',')
   }
   params.exportFields = columns.value.filter(item => item.visible).map(item => item.key).join(',')
-  proxy.download('/crm/contact/export', params, '分解分层触达.xlsx')
+  proxy.download('/crm/contact/export', params, '分解分层触达.xlsx', { appCode: 'crm' })
 }
 
 function init () {
@@ -715,9 +692,6 @@ function init () {
   })
   listFeatureTagTree({}).then(res => {
     featureTags.value = res.data || []
-  })
-  getGridTree().then(res => {
-    gridNodes.value = res.data || []
   })
   // 先加载字段元数据与用户列配置，再加载客群并发出首个列表请求；加载失败时按默认列查询
   loadDataTagMeta().then(() => loadColumnConfig()).catch(() => {}).finally(() => {

@@ -684,7 +684,7 @@ function handleExport () {
     proxy.$modal.msgWarning('请选择开始日期和结束日期')
     return
   }
-  proxy.download('/crm/reach/export', buildParams(), '客户触达明细.xlsx')
+  proxy.download('/crm/reach/export', buildParams(), '客户触达明细.xlsx', { appCode: 'crm' })
 }
 
 function formatNumber (value) {

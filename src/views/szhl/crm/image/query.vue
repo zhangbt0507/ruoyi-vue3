@@ -466,6 +466,7 @@ import { listImage, listImageCustomer, delImage, restoreImage, listImageCategory
 import CustomerLink from '@/views/szhl/crm/components/CustomerLink'
 import { formatUserDisplayName, useUserOptions } from '@/utils/userEnum'
 import useUserStore from '@/store/modules/user'
+import gatewayUrl from '@/utils/gatewayUrl'
 
 const { proxy } = getCurrentInstance()
 const { sys_org_name: orgOptions } = proxy.useDict('sys_org_name')
@@ -526,7 +527,7 @@ const detailQuery = reactive({
 const { queryParams } = toRefs(data)
 
 const previewUrl = computed(() => {
-  return previewRow.value.filePath ? import.meta.env.VITE_APP_BASE_API + "-crm"+ previewRow.value.filePath : ''
+  return previewRow.value.filePath ? gatewayUrl(previewRow.value.filePath, 'crm') : ''
 })
 
 const customerTableEmptyText = computed(() => {

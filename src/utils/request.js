@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ElNotification , ElMessageBox, ElMessage, ElLoading } from 'element-plus'
 import { getToken } from '@/utils/auth'
+import { getHistoryMonth } from '@/utils/historyMonth'
 import errorCode from '@/utils/errorCode'
 import { tansParams, blobValidate } from '@/utils/ruoyi'
 import cache from '@/plugins/cache'
@@ -38,6 +39,11 @@ service.interceptors.request.use(config => {
   const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
   if (getToken() && !isToken) {
     config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+  }
+  // 归属列表切到历史月份时带上，供后端 CrmHistoryMonthGuardInterceptor 识别并拒绝写操作；「当前」视图不带
+  const historyMonth = getHistoryMonth()
+  if (historyMonth) {
+    config.headers['X-Crm-Data-Month'] = historyMonth
   }
   // get请求映射params参数
   if (config.method === 'get' && config.params) {

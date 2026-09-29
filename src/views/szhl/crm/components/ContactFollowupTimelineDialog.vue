@@ -44,7 +44,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column label="时间" width="170" align="center">
-                  <template #default="{ row: item }">{{ parseTime(item.followupDate, '{y}-{m}-{d} {h}:{i}:{s}') || '-' }}</template>
+                  <template #default="{ row: item }">{{ parseTime(item.followupDate, '{y}-{m}-{d}') || '-' }}</template>
                 </el-table-column>
                 <el-table-column label="方式" width="110" align="center">
                   <template #default="{ row: item }">{{ dictText(contactWayOptions, item.followupWay) }}</template>
@@ -84,7 +84,7 @@
           </template>
         </el-table-column>
         <el-table-column label="时间" width="170" align="center">
-          <template #default="{ row }">{{ parseTime(row.contactDate, '{y}-{m}-{d} {h}:{i}:{s}') || '-' }}</template>
+          <template #default="{ row }">{{ parseTime(row.contactDate, '{y}-{m}-{d}') || '-' }}</template>
         </el-table-column>
         <el-table-column label="触达方式" width="110" align="center">
           <template #default="{ row }">{{ wayText(row) }}</template>
@@ -148,7 +148,7 @@
           <div class="cf-info-grid">
             <div class="cf-info">
               <span class="cf-info__label">时间</span>
-              <span class="cf-info__value">{{ parseTime(current.contactDate, '{y}-{m}-{d} {h}:{i}:{s}') || '-' }}</span>
+              <span class="cf-info__value">{{ parseTime(current.contactDate, '{y}-{m}-{d}') || '-' }}</span>
             </div>
             <div class="cf-info">
               <span class="cf-info__label">触达方式</span>
@@ -224,7 +224,7 @@
               <div class="cf-timeline__item">
                 <div class="cf-timeline__head">
                   <span class="cf-timeline__name">跟踪（第{{ index + 1 }}次）</span>
-                  <span class="cf-timeline__date">{{ parseTime(item.followupDate, '{y}-{m}-{d} {h}:{i}:{s}') || '-' }}</span>
+                  <span class="cf-timeline__date">{{ parseTime(item.followupDate, '{y}-{m}-{d}') || '-' }}</span>
                 </div>
                 <div class="cf-timeline__meta">
                   <el-tag size="small" effect="plain">{{ dictText(contactWayOptions, item.followupWay) }}</el-tag>

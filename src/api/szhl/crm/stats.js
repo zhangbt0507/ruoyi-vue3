@@ -1,4 +1,5 @@
-import request from '@/utils/request'
+import { createRequest } from '@/utils/subRequest'
+const request = createRequest('crm')
 
 // 客户触达统计列表
 export function listContactStats(query) {

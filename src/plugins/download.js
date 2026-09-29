@@ -7,8 +7,8 @@ import { blobValidate } from '@/utils/ruoyi'
 import gatewayUrl from '@/utils/gatewayUrl'
 
 export default {
-  name(name, isDelete = true) {
-    var url = gatewayUrl('/common/download?fileName=' + encodeURIComponent(name) + '&delete=' + isDelete)
+  name(name, isDelete = true, appCode) {
+    var url = gatewayUrl('/common/download?fileName=' + encodeURIComponent(name) + '&delete=' + isDelete, appCode)
     axios({
       method: 'get',
       url: url,

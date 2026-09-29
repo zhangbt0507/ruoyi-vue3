@@ -1,4 +1,5 @@
-import request from '@/utils/request'
+import { createRequest } from '@/utils/subRequest'
+const request = createRequest('crm')
 
 // 客户 360 视图（base + db2 + portraitTagNames）
 export function getCustomerView(customerNo) {

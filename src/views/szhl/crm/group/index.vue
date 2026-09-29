@@ -289,6 +289,7 @@ import { computed, getCurrentInstance, nextTick, reactive, ref, toRefs } from 'v
 import * as XLSX from 'xlsx'
 import { ElMessageBox } from 'element-plus'
 import { getToken } from '@/utils/auth'
+import gatewayUrl from '@/utils/gatewayUrl'
 import { listGroup, createGroup, updateGroup, delGroup, verifyGroup, listImportTemp, listGroupCustomerDetail, distributeGroup, withdrawGroup } from '@/api/szhl/crm/group'
 import SearchForm from '@/components/SearchForm'
 import CustomerLink from '@/views/szhl/crm/components/CustomerLink'
@@ -373,7 +374,7 @@ const detailQuery = ref({
   managerId: undefined,
   verifyResult: undefined
 })
-const importUrl = import.meta.env.VITE_APP_BASE_API + "-crm/" + '/crm/group/import'
+const importUrl = gatewayUrl('/crm/group/import', 'crm')
 const uploadHeaders = { Authorization: 'Bearer ' + getToken() }
 const verifyStats = computed(() => parseVerifyCounts(verifyMessage.value))
 const verifyAlert = computed(() => {
@@ -754,7 +755,7 @@ function verifyResultTagType (result) {
 }
 
 function downloadVerifyResult () {
-  proxy.download('/crm/group/import/verify/result', { groupId: importGroup.value.id }, '校验结果.xlsx')
+  proxy.download('/crm/group/import/verify/result', { groupId: importGroup.value.id }, '校验结果.xlsx', { appCode: 'crm' })
 }
 
 function downloadImportTemplate () {

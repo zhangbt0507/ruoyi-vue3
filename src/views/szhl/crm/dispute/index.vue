@@ -565,7 +565,7 @@ function handleExport() {
   const params = { ...queryParams.value }
   delete params.pageNum
   delete params.pageSize
-  proxy.download('/crm/dispute/export', params, '归属变动审批.xlsx')
+  proxy.download('/crm/dispute/export', params, '归属变动审批.xlsx', { appCode: 'crm' })
 }
 
 onDeactivated(() => {
