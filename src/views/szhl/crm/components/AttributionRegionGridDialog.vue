@@ -24,6 +24,20 @@
         <el-button :icon="Search" @click="doLocate">查询</el-button>
       </div>
 
+      <!-- 快捷跳转 -->
+      <div class="region-grid__shortcuts">
+        <span class="region-grid__shortcuts-label">快捷跳转：</span>
+        <el-button
+          v-for="item in shortcuts"
+          :key="item.code"
+          size="small"
+          text
+          @click="handleShortcut(item)"
+        >
+          {{ item.name }}
+        </el-button>
+      </div>
+
       <!-- 当前浏览路径 / 定位错误提示 -->
       <div class="region-grid__crumb">
         <span v-if="locateError" class="region-grid__crumb-error">{{ locateError }}</span>
@@ -104,6 +118,19 @@ const SEARCH_LIMIT = 10
 const REGION_CODE_LENGTHS = [2, 4, 6, 9, 12, 15]
 // 网格维护未带 gridCode 时的默认展开位置：浙江省 / 金华市 / 磐安县
 const DEFAULT_REGION_CODE = '330727'
+
+// 快捷跳转城市列表（按层级+常用度排序）
+const shortcuts = [
+  { code: '33', name: '浙江省' },
+  { code: '3301', name: '杭州市' },
+  { code: '3302', name: '宁波市' },
+  { code: '3307', name: '金华市' },
+  { code: '330727', name: '磐安县' },
+  { code: '330782', name: '义乌市' },
+  { code: '330783', name: '东阳市' },
+  { code: '31', name: '上海市' },
+  { code: '11', name: '北京市' }
+]
 
 const visible = ref(false)
 const gridForm = ref({})
@@ -291,6 +318,19 @@ async function handleClearKeyword () {
   await resetColumns()
   scrollActiveIntoView()
 }
+
+// 快捷跳转：按城市编码快速定位
+async function handleShortcut (item) {
+  keyword.value = ''
+  locateError.value = ''
+  const node = await loadPath(item.code)
+  if (node) {
+    await locateTo(node)
+  } else {
+    locateError.value = `无法定位到 ${item.name}`
+  }
+}
+
 async function open (row) {
   gridForm.value = { customerId: row.customerId, customerName: row.customerName }
   keyword.value = ''
@@ -388,6 +428,23 @@ defineExpose({ open })
 }
 .region-grid__search .el-input {
   flex: 1;
+}
+
+/* 快捷跳转行：text 按钮自带外边距会把间距撑歪，统一清零后用 gap 控制 */
+.region-grid__shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.region-grid__shortcuts-label {
+  flex: none;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+}
+.region-grid__shortcuts .el-button + .el-button {
+  margin-left: 0;
 }
 
 /* 当前浏览路径 */

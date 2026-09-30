@@ -36,11 +36,16 @@ export function getRegionPath(code) {
   })
 }
 
-// 全量启用节点（扁平），一次性拉回后前端本地建树/展开/定位。
-// 表当前 600+ 行，一次加载可接受；此后展开、搜索、回显都不再打后端。
-export function listRegionAll() {
+/**
+ * 批量取编码及其全部祖先（扁平列表，含每条的 level / name / parentCode）。
+ * 供「拿到一批编码、要显示它们上溯两级的名称」这类场景一次问回，
+ * 例如触达统计页按当前页每行的 grid_code 解析乡镇(level4)/村社区(level5)。
+ * 编码数量由后端钳制上限。
+ */
+export function listRegionAncestors(codes) {
   return request({
-    url: '/crm/region/all',
-    method: 'get'
+    url: '/crm/region/ancestors',
+    method: 'get',
+    params: { codes: Array.isArray(codes) ? codes.join(',') : codes }
   })
 }

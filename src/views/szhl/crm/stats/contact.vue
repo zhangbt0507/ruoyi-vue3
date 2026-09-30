@@ -85,7 +85,7 @@
 import { computed, getCurrentInstance, reactive, ref, toRefs } from 'vue'
 import { listContactStats, contactSummaryOrg, contactSummaryManager } from '@/api/szhl/crm/stats'
 import { selectGroupList } from '@/api/szhl/crm/group'
-import { getGridTree } from '@/api/szhl/crm/attribution'
+import { listRegionAncestors } from '@/api/szhl/crm/region'
 import SearchForm from '@/components/SearchForm'
 import CustomerLink from '@/views/szhl/crm/components/CustomerLink'
 import CrmOrgSelect from '@/views/szhl/crm/components/CrmOrgSelect'
@@ -105,7 +105,9 @@ const loading = ref(false)
 const tableList = ref([])
 const total = ref(0)
 const groupOptions = ref([])
-const gridNodes = ref([])
+// 本页涉及的区域节点（编码 -> 节点），含各自祖先，用来把 grid_code 解析成乡镇/村名称。
+// 只装本页去重后的编码及其祖先，不再把整棵区域树拉回本地。
+const gridNodeMap = ref({})
 const selectedGroupIds = ref([])
 const summaryOpen = ref(false)
 const summaryLoading = ref(false)
@@ -129,14 +131,6 @@ const data = reactive({
 })
 
 const { queryParams } = toRefs(data)
-
-const gridNodeMap = computed(() => {
-  const map = {}
-  gridNodes.value.forEach(item => {
-    if (item.gridCode) map[item.gridCode] = item
-  })
-  return map
-})
 
 const tableColumns = [
   { key: 'seq', label: '序号', width: 64, align: 'center', fixed: 'left', slot: 'seq' },
@@ -232,6 +226,7 @@ function getList () {
   listContactStats(buildParams(true)).then(res => {
     tableList.value = res.rows || []
     total.value = res.total || 0
+    loadGridNames(tableList.value)
   }).finally(() => {
     loading.value = false
   })
@@ -325,19 +320,47 @@ function formatUser (value) {
   return formatUserDisplayName(managerOptions.value, value)
 }
 
+// 表格行只存网格编码（grid_code 即 crm_region_code 编码），乡镇/村两级名称另查。
+// chain 以行政区划原始 level 为键：4=乡镇/街道、5=行政村/社区、6=网格，
+// 与后端 CrmRegionCodeServiceImpl.LEN_TO_LEVEL 一致。
 function resolveGridLocation (gridCode) {
   if (!gridCode) return { street: '-', community: '-' }
   let current = gridNodeMap.value[gridCode]
+  // 编码不在区域表里（存量旧网格码），原样显示编码
   if (!current) return { street: '-', community: gridCode }
   const chain = {}
   while (current) {
     chain[current.level] = current
     current = current.parentCode ? gridNodeMap.value[current.parentCode] : undefined
   }
+  // 只有乡镇/村/网格三级有对应列可显示；本级就是省/市/县时同样回落显示编码
+  if (!chain[4]) return { street: '-', community: gridCode }
   return {
-    street: chain[1]?.gridName || '-',
-    community: chain[2]?.gridName || '-'
+    street: chain[4].name || '-',
+    community: chain[5]?.name || '-'
   }
+}
+
+// 本页编码连祖先一次问回，避免逐行上溯时缺层。翻页过快时丢弃过期结果。
+let gridNameSeq = 0
+function loadGridNames (rows) {
+  const codes = [...new Set((rows || []).map(row => row.gridCode).filter(Boolean))]
+  const seq = ++gridNameSeq
+  if (!codes.length) {
+    gridNodeMap.value = {}
+    return
+  }
+  listRegionAncestors(codes).then(res => {
+    if (seq !== gridNameSeq) return
+    const map = {}
+    const nodes = res.data || []
+    nodes.forEach(node => {
+      if (node.code) map[node.code] = node
+    })
+    gridNodeMap.value = map
+  }).catch(() => {
+    if (seq === gridNameSeq) gridNodeMap.value = {}
+  })
 }
 
 function formatGridStreet (gridCode) {
@@ -349,9 +372,6 @@ function formatGridCommunity (gridCode) {
 }
 
 function init () {
-  getGridTree().then(res => {
-    gridNodes.value = res.data || []
-  })
   selectGroupList().then(res => {
     groupOptions.value = res.data || []
     if (groupOptions.value.length > 0) {

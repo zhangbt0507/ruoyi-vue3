@@ -81,14 +81,6 @@ export function saveRegionGrid(data) {
   })
 }
 
-// 网格树（扁平列表，前端按 parentCode 组树）
-export function getGridTree() {
-  return request({
-    url: '/crm/attribution/grid/tree',
-    method: 'get'
-  })
-}
-
 // 关联客户列表
 export function listRelation(customerId) {
   return request({
